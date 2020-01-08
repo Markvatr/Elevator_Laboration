@@ -93,22 +93,26 @@ void elevatorDoorsClose(struct elevator *_elevator, struct event* curEvent) {
 		switch (elevatorDirection(_elevator)){	
 		//Ascending
 		case 1:
-			while (_elevator->capacity - _elevator->numPassengers > 0 && peekNextPassenger(&waitingUp[_elevator->currentPosition],p) != NULL){
-				struct passenger *pass = getNextPassenger(&waitingUp[_elevator->currentPosition], p);
-				addPassenger(&_elevator->passengers, pass->time, pass->sourceLevel, pass->destinationLevel, SORT_DESTINATION_ASCENDING);
-				free(pass);
-				_elevator->numPassengers++;
-				printf("Passenger loaded @ floor %d @ time %u\n", _elevator->currentPosition, curEvent->time);				
+			while (_elevator->capacity - _elevator->numPassengers > 0 && peekNextPassenger(&(waitingUp[_elevator->currentPosition]),p) != NULL){
+				struct passenger *pass = getNextPassenger(&(waitingUp[_elevator->currentPosition]), p);
+				if(pass->sourceLevel == _elevator->currentPosition){
+					addPassenger(&_elevator->passengers, pass->time, pass->sourceLevel, pass->destinationLevel, SORT_DESTINATION_ASCENDING);
+					_elevator->numPassengers++;
+					
+					printf("Passenger loaded @ floor %d @ time %u\n", _elevator->currentPosition, curEvent->time);				
+				}
 			}
 			break;
 		//Descending
 		case -1:
-			while (_elevator->capacity - _elevator->numPassengers > 0 && peekNextPassenger(&waitingDown[_elevator->currentPosition - 1],p) != NULL){
+			while (_elevator->capacity - _elevator->numPassengers > 0 && waitingDown[_elevator->currentPosition - 1].firstElement != NULL){
 				struct passenger *pass = getNextPassenger(&waitingDown[_elevator->currentPosition - 1], p);
-				addPassenger(&_elevator->passengers, pass->time, pass->sourceLevel, pass->destinationLevel, SORT_DESTINATION_DESCENDING);
-				free(pass);
-				_elevator->numPassengers++;
-				printf("Passenger loaded @ floor %d @ time %u\n", _elevator->currentPosition, curEvent->time);
+				if(pass->sourceLevel == _elevator->currentPosition){
+					addPassenger(&_elevator->passengers, pass->time, pass->sourceLevel, pass->destinationLevel, SORT_DESTINATION_ASCENDING);
+					_elevator->numPassengers++;
+					
+					printf("Passenger loaded @ floor %d @ time %u\n", _elevator->currentPosition, curEvent->time);				
+				}
 			}
 		break;
 		case 0:
@@ -155,8 +159,8 @@ void elevatorDoorsClose(struct elevator *_elevator, struct event* curEvent) {
 }
 
 int elevatorDirection(struct elevator *elevator){
-	struct passenger *nextPassenger;
-	if (peekNextPassenger(&elevator->passengers,nextPassenger) != NULL){
+	struct passenger *nextPassenger = peekNextPassenger(&elevator->passengers,nextPassenger);
+	if (nextPassenger != NULL){
 		if(elevator->currentPosition - nextPassenger->destinationLevel > 0){
 			return -1;
 		}else{
