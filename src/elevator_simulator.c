@@ -10,7 +10,7 @@
 /* 
  * Assume the levels are numbered 0, 1, ... , NUM_LEVELS-1
  */
-#define NUM_LEVELS 7
+#define NUM_LEVELS 6
 
 /*
  * Maximum number of passengers that can be in the elevator at the same time. 
